@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do list</title>
+    <style>
+        *{
+            font-family: sans-serif; padding: 0;margin:0;
+            box-sizing: border-box; 
+        }
+        ::selection{
+            background-color: transparent;
+        }
+        ::-webkit-scrollbar{
+            width: 5px;
+        }
+        ::-webkit-scrollbar-thumb{
+            background-color: rgb(255, 147, 165);
+        }
+        body{
+            min-height: 100dvh; min-width: 100%;
+            display: flex; align-items: center; justify-content:center;
+            background-color: rgb(214, 214, 211);
+        }
+        .container{
+            width: 600px;
+            min-height: 100dvh;
+            background-color: rgb(255, 217, 171);
+        }
+        .header{
+            width: 100%; height: 10dvh;
+            background-color: #229bc6;
+            font-size: 20px;gap: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding:0 20px; font-weight: bolder;
+        }
+        .list{
+            width: 100%; height: 90dvh; 
+            overflow: auto;
+        }
+        
+        #heading{
+            color: rgb(114, 255, 5);
+            cursor: pointer;position: relative;
+            transition: color .2s ease-in-out;
+            padding: 5px; flex-grow: 1;
+        }
+        #heading::before{
+            content: "";
+            position:absolute;
+            left:0;bottom: 0; width: 0;
+            height: 0.2rem; 
+            background:linear-gradient(to right,rgb(255, 0, 21),rgb(228, 84, 214),rgb(255, 34, 233));
+            border-radius: 20px; transition:width .2s ease-in-out;
+        }
+        #heading:hover::before{
+            width: 100%;
+        }
+        #heading:hover{
+            color: rgb(241, 241, 231);
+        }
+        .listitem{
+            display: flex; align-items: center;justify-content: space-between;
+            cursor: pointer;
+            padding: 20px;
+            background-color: white;gap: 30px;
+            border-bottom: 1px solid #ccc;position: relative;
+        }
+        .listitem::after{
+            content: "";border-radius: 5px;
+            position: absolute;top: 40%;left: 50%; transform: translate(-50%,-50%);
+            width:0; height: 5px; background-color: rgb(223, 222, 222);
+            transition: width 1.5s ease-in-out;
+        }
+        .listitem.complete::after{
+            width: 95%;
+        }
+        .Details{
+            height: 100%;display: flex;row-gap: 6px;flex-flow: column nowrap;
+        }
+        .listhead{
+            font-size: 22px;color: #222;
+            transition: color 1.5s ease-in-out;
+        }
+        .listdescription{
+            font-size: 16px;color: #666;
+            transition: color 1.5s ease-in-out;
+        }
+        .listhead.complete{
+            color:rgb(223, 222, 222);
+        }
+        .listdescription.complete{
+            color:rgb(223, 222, 222);
+        }
+        input[type="checkbox"]{
+            box-sizing: content-box;
+            accent-color: rgb(114, 255, 5);
+            height: 30px;width: 30px;
+            flex-shrink: 0;align-self: baseline;
+            cursor:pointer;
+            transition:accent-color 1.5s ease-in-out;
+        }
+        #novalues{
+            height: 90dvh;width: 100%;
+            background-color: white;
+            display: none; align-items: center;
+            justify-content: center;
+        }
+        #novalues p{
+            text-align: center; line-height: 30px;
+        }
+        #notask{
+            font-size: 20px; font-weight: bolder;
+            color:  #222;
+        }
+        #addone{
+            color: #999;
+        }
+        button{
+            font-size: 40px; border: none; background-color: transparent;
+            color: rgb(114, 255, 5);
+            transition: transform .15s ease-in-out;
+        }
+        button:hover{
+            transform:scale(1.5);
+        }
+        #plus{
+            transition: color .2s ease-in-out,transform .2s ease-in-out;
+            cursor: pointer;
+        }
+        #plus:hover{
+            color:white
+        }
+        .dialogbox{
+            position: fixed;
+            height: 100dvh;
+            width: 100dvw;top: -100%;left: 50%;
+            transform: translate(-50%,-50%);background-color: rgba(0, 0, 0, 0.605);
+            backdrop-filter: blur(2px);transition: top .5s ease-in-out;
+        }
+        #dialog{
+            background-color: rgb(121, 248, 121);
+            height: 70%; width: 40%;top: 50%;left: 50%;
+            transform: translate(-50%,-50%);
+            border-radius: 20px; position: relative;padding: 20px;
+            display: flex; flex-flow: column nowrap;
+            justify-content: space-around; align-items: flex-start;
+        }
+        #dialog label{
+            font-size: 26px; font-family: system-ui,sans-serif;
+            color: #444;font-weight: bolder;
+        }
+        #dialog input{
+            height: 12%; width: 100%;
+            padding: 2px 10px;font-size: 20px;
+            margin-left: auto; border: none; outline: none;
+            border-radius:5px; box-shadow: 0 0 10px 1px rgb(181, 181, 181);
+        }
+        #close{
+            top: 15%;left: 50%;
+            transform: translate(-50%,-50%);
+            border-radius: 50%; position: relative;
+            font-family:'Franklin Gothic Medium',sans-serif;
+            transition: color .2s ease-in-out;
+        }
+        #close:hover{
+            color: white;
+        }
+        #close:hover::after{
+            background:linear-gradient(to left top,blue,navy);
+        }
+        #close::after{
+            content: "";
+            position: absolute;
+            top: 0;left: -50%; background:linear-gradient(to right bottom,blue,navy);
+            height: 50px;width: 50px; z-index: -1; border-radius: 50%;
+        }
+        #dustbin:hover{
+            color: white !important;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .btn{
+            display: flex;
+            width: 100%;justify-content: space-around;
+            padding: 0 20px;gap: 50px;
+        }
+        #ok,#notok{
+            font-size: 1.5rem;font-weight: bold;
+            font-family: system-ui,sans-serif;border: none;
+            border-radius: 12px; transition: all .2s ease-in-out;
+            color: white;flex-grow: 1;flex-basis: 30%;
+        }
+        #ok{
+            background-color: rgb(91, 91, 240);
+            padding: 10px 20px; box-shadow: 0 6px 0 rgba(119, 119, 234, 0.689);
+        }
+        #notok{
+            background-color: rgb(254, 36, 36);
+            padding: 10px 20px; box-shadow: 0 6px 0 rgb(230, 116, 116,0.689);
+        }
+        #ok:hover,#notok:hover{
+            transform: scale(1.06);
+        }
+        #ok:active,#notok:active{
+            box-shadow: none; transform: translateY(6px);
+        }
+        @media (max-width:1200px){
+            #dialog{
+                width: 50%;
+            }
+        }
+        @media (max-width:900px){
+            #dialog{
+                width: 90%;
+            }
+        }
+        @media (max-width:600px){
+            #dialog{
+                width: 100%;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <p id="heading">To-Do List</p>
+            <button onclick="opener()" id="plus">
+                +
+            </button>
+           <button id="dustbin" title="delete your account!.."> &#x1F5D1;</button>
+        </div>
+        <div class="list">
+            <div id="novalues" >
+                <p>
+                    <span id="notask">No Tasks Yet!...</span><br>
+                    <span id="addone">Add one right now using plus button on top</span>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="dialogbox">
+        <button id="close" onclick="closer()">X</button>
+        <div id="dialog">
+            <label for="title">Enter task title : </label>
+            <input type="text" name="title" id="title" required>
+            <label for="description">Enter task description : </label>
+            <input type="text" name="description" id="description" required>
+            <div class="btn">
+                <button id="ok">Save Task!..</button>
+                <button id="notok" onclick="closer()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        if(localStorage.getItem("username_@")===null){
+            location.href="./taskapp_newuser.html";
+        }
+        if(localStorage.getItem("username_@") !== null)
+        {
+        document.getElementById("heading").innerText=localStorage.getItem("username_@")+"'s To-Do List";
+        }
+
+        function opener(){
+            dialogbox = document.querySelector(".dialogbox");
+            dialogbox.style.top="50%";
+        }
+        function closer(){
+            dialogbox = document.querySelector(".dialogbox");
+            dialogbox.style.top="-100%";
+        }
+        function checker(){
+            if(localStorage.length==0 || (obj.length==1 && obj.key(0)=="username_@")){
+                document.getElementById("novalues").style.display="flex";
+            }
+        }
+
+        document.getElementById("ok").addEventListener("click",()=>{
+            let temptitle = document.getElementById("title");
+            let tempdes = document.getElementById("description");
+            if(!temptitle.value.length){
+                alert("Enter title to continue...");
+            }else{
+                localStorage.setItem(temptitle.value,tempdes.value);
+                location.reload();
+            }
+        });
+
+        let obj = localStorage;let update="";
+        if(obj.length==0 || (obj.length==1 && obj.key(0)=="username_@")){
+            document.getElementById('novalues').style.display="flex";
+        }else{
+            for(let i=0;i<obj.length;i++){
+                key = obj.key(i);
+                value = obj.getItem(key);
+                if(key != "username_@"){
+                update+=`<div class="listitem" id="`+ key +`">
+                    <div class="Details">
+                        <p class="listhead" name="listhead">`+key+`</p>
+                        <p class="listdescription">`+value+`</p>
+                    </div>
+                        <input type="checkbox" title="task completed ?..."></div>`;
+                }
+            }
+            update+=`<div id="novalues">
+                <p>
+                    <span id="notask">No Tasks Yet!...</span><br>
+                    <span id="addone">Add one right now using plus button on top</span>
+                    
+                </p>
+            </div>`;
+            document.querySelector(".list").innerHTML=update;
+        }
+
+        document.querySelectorAll("input[type='checkbox']").forEach((current,index)=>{
+    current.addEventListener("change",()=>{
+        if(current.checked){
+            st = confirm("Have you completed this task..\nBy clicking OK the task will be erased");
+            if(st)
+            {
+                localStorage.removeItem(current.parentElement.id);
+                current.parentElement.classList.add("complete");
+                let details = current.parentElement.querySelector(".Details");
+                details.querySelector(".listhead").classList.add("complete");
+                details.querySelector(".listdescription").classList.add("complete");
+                current.style.accentColor="rgb(223, 222, 222)";
+                setTimeout(()=>{
+                current.parentElement.style.display = "none";
+                checker();
+                },2000);
+            }else{
+                current.checked= false;
+            }
+        }
+    });
+});
+
+    document.querySelector("#dustbin").addEventListener("click",()=>{
+        deleteStatus = confirm("This action will delete your account\nAlong with all the tasks\nAre you willing to continue...");
+        if(deleteStatus){
+            localStorage.clear();
+            location.reload();
+        }
+    });
+
+    </script>
+</body>
+</html>

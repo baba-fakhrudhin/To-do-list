@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List Registration</title>
+    <style>
+        *{
+            font-family:system-ui,sans-serif;
+            margin:0;padding:0; background-color: rgb(214, 214, 211);
+            color: black; font-weight: bold; font-size: 25px; 
+        }
+        ::selection{
+            background-color: transparent;
+        }
+        body{
+            display: flex; align-items: center;
+            justify-content: center;
+            height: 100dvh; width: 100dvw;
+        }
+        .container{ 
+            display: flex;width: 100%;height: 50%;gap: 20px;
+            align-items: center;justify-content: center;
+        }
+        
+        input{
+            border: none; outline: none;
+        }
+        #toast{
+            position: fixed; top: 10%;left: -100%;
+            padding:10px 20px;background-color: rgb(252, 200, 200);
+            font-size: 16px; color: #222;border-left: 10px solid rgb(255, 0, 0);
+            transition: left .25s ease-in-out,opacity .5s ease-out;
+        }
+        #greet{
+            position: fixed; top: 100%;
+            left: 50%; transform: translate(-50%,-50%);
+             text-align: center; transition: top .2s ease-in-out;
+             
+        }
+        button{
+            color: white;padding:10px 30px;
+            border: 2px dashed black;
+            border-radius: 10px; transition: color .2s ease-in-out,background-color .2s ease-in-out;
+        }
+        button:hover{
+            color: #222;
+            background-color: white;
+        }
+        @media (max-width:700px){
+            .container{
+                flex-direction: column;
+            }
+            input{
+            text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <label for="uname">Enter your name :&nbsp;</label>
+        <input type="text" name="uname" id="uname">
+        <button>OK</button>
+    </div>
+        <p id="greet">
+        </p>
+    <p id="toast">Press Enter Or ok button after typing name !..</p>
+    <script>
+        inputer = document.getElementById("uname");
+        inputer.focus();
+        document.getElementById("toast").style.left="20px";
+
+        setTimeout(()=>{
+            document.getElementById("toast").style.opacity="0";
+        },5000);
+
+        inputer.addEventListener("keypress",(key)=>{
+            if(key.code == "Enter"){
+                fun(inputer);
+            }
+        });
+
+        document.querySelector("button").addEventListener("click",()=>{
+            fun(inputer);
+        });
+
+        function fun(inputer){
+        if(inputer.value.length == 0){
+                    alert("Enter your name properly!..")
+                }else{
+                    localStorage.setItem("username_@",inputer.value.trim());
+                    document.querySelector(".container").style.display="none";
+                    let greet = document.getElementById("greet");
+                    greet.innerText="Hello, "+inputer.value+"\n Now u can have your own tasklist enjoy\nredirecting...";
+                    greet.style.top="50%";
+                    setTimeout(()=>{
+                        location.href="./taskapp.html";
+                    },4000);
+                }
+        }
+    </script>
+</body>
+</html>
